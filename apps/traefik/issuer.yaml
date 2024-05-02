@@ -1,0 +1,26 @@
+---
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-production
+spec:
+  acme:
+    server: https://acme-v02.api.letsencrypt.org/directory
+    email: braineniac@protonmail.com # add your email 
+    privateKeySecretRef:
+      name: letsencrypt-production
+    solvers:
+      - dns01:
+          webhook:
+            groupName: acme.quackforge.dev
+            solverName: porkbun
+            config:
+              apiKeySecretRef:
+                name: porkbun-key
+                key: api-key
+              secretKeySecretRef:
+                name: porkbun-key
+                key: secret-key
+        selector:
+          dnsZones:
+            - "quackforge.dev" # change to your zone on CloudFlare

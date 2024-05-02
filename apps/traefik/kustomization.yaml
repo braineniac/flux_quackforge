@@ -1,0 +1,53 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: traefik
+resources:
+  - default-headers.yaml
+  - ingress.yaml
+  - middleware.yaml
+  - namespace.yaml
+  - repository.yaml
+  - release.yaml
+configMapGenerator:
+  - name: traefik-values
+    files:
+      - values.yaml=values-traefik.yaml
+secretGenerator:
+  - name: traefik-secret
+    files:
+      - values.yaml=secret-dashboard.yaml
+configurations:
+  - configuration.yaml
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: cert-manager
+resources:
+  - certificate.yaml
+  - issuer.yaml
+  - namespace.yaml
+  - repository.yaml
+  - release.yaml
+configMapGenerator:
+  - name: cert-manager-values
+    files:
+      - values.yaml=values-cert-manager.yaml
+configurations:
+  - configuration.yaml
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: cert-manager
+resources:
+  - ./rbac.yaml
+configMapGenerator:
+  - name: porkbun-webhook-values
+    files:
+      - values.yaml=values-porkbun-webhook.yaml
+secretGenerator:
+  - name: podinfo-values
+    files:
+      - values.yaml=porkbun-key.yaml
+configurations:
+  - configuration.yaml

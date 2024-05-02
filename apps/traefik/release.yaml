@@ -1,0 +1,97 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
+kind: HelmRelease
+metadata:
+  name: traefik
+  namespace: traefik
+spec:
+  interval: 10m0s
+  timeout: 5m0s
+  chart:
+    spec:
+      chart: traefik
+      version: '27.0.*'
+      reconcileStrategy: ChartVersion
+      sourceRef:
+        kind: HelmRepository
+        name: traefik
+      interval: 10m0s
+  releaseName: traefik
+  targetNamespace: traefik
+  install:
+    crds: CreateReplace
+    createNamespace: true
+  upgrade:
+    crds: CreateReplace
+    remediation: rollback
+  driftDetection:
+    mode: warn
+  valuesFrom:
+  - kind: ConfigMap
+    name: traefik-values
+  - kind: Secret
+    name: traefik-secret
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
+kind: HelmRelease
+metadata:
+  name: cert-manager
+  namespace: cert-manager
+spec:
+  interval: 10m0s
+  timeout: 5m0s
+  chart:
+    spec:
+      chart: cert-manager
+      version: 'v1.13.*'
+      reconcileStrategy: ChartVersion
+      sourceRef:
+        kind: HelmRepository
+        name: cert-manager
+      interval: 10m0s
+  releaseName: cert-manager
+  targetNamespace: cert-manager
+  install:
+    crds: CreateReplace
+    createNamespace: true
+  upgrade:
+    crds: CreateReplace
+    remediation: rollback
+  driftDetection:
+    mode: warn
+  valuesFrom:
+  - kind: ConfigMap
+    name: cert-manager-values
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
+kind: HelmRelease
+metadata:
+  name: porkbun-webhook
+  namespace: cert-manager
+spec:
+  interval: 10m0s
+  timeout: 5m0s
+  chart:
+    spec:
+      chart: ./deploy/porkbun-webhook
+      version: '0.1.4'
+      reconcileStrategy: ChartVersion
+      sourceRef:
+        kind: GitRepository
+        name: porkbun-webhook
+      interval: 10m0s
+  releaseName: porkbun-webhook
+  targetNamespace: cert-manager
+  install:
+    crds: CreateReplace
+    createNamespace: true
+  upgrade:
+    crds: CreateReplace
+    remediation: rollback
+  driftDetection:
+    mode: warn
+  valuesFrom:
+  - kind: ConfigMap
+    name: porkbun-webhook-values
+  - kind: Secret
+    name: porkbun-webhook-secret
